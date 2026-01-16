@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eluria - Método CCJ</title>
+    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #020B1C;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #020B1C;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ffffff;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .header-left img {
+            height: 50px;
+        }
+        .header-title {
+            font-size: 22px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .logout-button button {
+            background: none;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+        h2 {
+            color: #f8f8f8;
+            font-size: 24px;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            font-size: 15px;
+            color: #aaa;
+            margin-bottom: 1.5rem;
+        }
+        form label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        form label i {
+            color: #ffffff;
+        }
+        form input[type="number"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 5px;
+            margin-top: 0.25rem;
+            background-color: #1C2541;
+            color: white;
+        }
+        form input[type="number"]::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        form .description {
+            font-size: 12px;
+            color: #666;
+            margin-top: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+        form button {
+            margin-top: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background-color: #ffffff;
+            border: none;
+            color: #020B1C;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .results {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+        .card {
+            background-color: #0B132B;
+            border-radius: 10px;
+            padding: 1rem;
+            width: 260px;
+            text-align: center;
+            box-shadow: 0 0 8px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.5s forwards;
+        }
+        .card i {
+            font-size: 2rem;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        canvas {
+            margin-top: 2rem;
+        }
+        footer {
+            margin-top: 3rem;
+            padding: 2rem;
+            background-color: #000;
+            text-align: center;
+            color: #aaa;
+            font-size: 14px;
+        }
+        footer a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="alert alert-info" role="alert" style="background:#102a43; border:1px solid #1e3a8a; color:#c7d2fe;">
+    <strong>Lead:</strong> {{ lead.name }} — {{ lead.email }}{% if lead.company %} • {{ lead.company }}{% endif %} • {{ lead.phone }}
+  </div>
+<header>
+    <div class="header-left">
+        <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Eluria">
+        <div class="header-title">CALCULADORA COMERCIAL ELURIA - MÉTODO CCJ</div>
+    </div>
+    <div class="logout-button">
+        <form action="/logout" method="POST">
+            <button type="submit">Sair</button>
+        </form>
+    </div>
+</header>
+<div class="container">
+    <h2>Simule seus resultados comerciais</h2>
+    <p class="subtitle">Descubra quantos leads, vendas e receita sua empresa pode alcançar com base nos seus investimentos e taxas de conversão.</p>
+    <form method="POST">
+        <label><i class="fas fa-bullhorn"></i> Investimento mensal em mídia (R$)</label>
+        <input type="number" step="0.01" name="investimento" required placeholder="ex: 5000">
+        <p class="description">Quanto sua empresa investe por mês em anúncios e mídia paga.</p>
+
+        <label><i class="fas fa-coins"></i> Custo por lead (R$)</label>
+        <input type="number" step="0.01" name="custo_lead" required placeholder="ex: 10">
+        <p class="description">Custo médio para adquirir cada lead (cliente potencial).</p>
+
+        <label><i class="fas fa-calendar-check"></i> Taxa de agendamento (%)</label>
+        <input type="number" step="0.01" name="taxa_agendamento" required placeholder="ex: 20">
+        <p class="description">Porcentagem de leads que agendam uma reunião após o contato.</p>
+
+        <label><i class="fas fa-users"></i> Taxa de comparecimento (%)</label>
+        <input type="number" step="0.01" name="taxa_comparecimento" required placeholder="ex: 70">
+        <p class="description">Porcentagem de pessoas que comparecem às reuniões agendadas.</p>
+
+        <label><i class="fas fa-handshake"></i> Taxa de conversão em vendas (%)</label>
+        <input type="number" step="0.01" name="taxa_conversao" required placeholder="ex: 30">
+        <p class="description">Porcentagem de reuniões que se tornam vendas efetivas.</p>
+
+        <label><i class="fas fa-receipt"></i> Ticket médio por venda (R$)</label>
+        <input type="number" step="0.01" name="ticket_medio" required placeholder="ex: 350">
+        <p class="description">Valor médio de cada venda fechada.</p>
+
+        <button type="submit">Calcular</button>
+    </form>
+
+    {% if resultados %}
+    <div id="results-box">
+        <div class="results">
+            
+        </div>
+    <div class="results" style="margin-top: 2rem;">
+    <div class="card"><i class="fas fa-user-plus"></i><strong> Leads:</strong><br>{{ resultados.leads }}</div>
+    <div class="card"><i class="fas fa-calendar-check"></i><strong> Agendamentos:</strong><br>{{ resultados.agendamentos }}</div>
+    <div class="card"><i class="fas fa-users"></i><strong> Comparecimentos:</strong><br>{{ resultados.comparecimentos }}</div>
+    <div class="card"><i class="fas fa-handshake"></i><strong> Vendas:</strong><br>{{ resultados.vendas }}</div>
+    <div class="card"><i class="fas fa-money-bill-trend-up"></i><strong> Receita estimada:</strong><br>R$ {{ resultados.receita }}</div>
+    <div class="card"><i class="fas fa-bullseye"></i><strong> ROAS:</strong><br>{{ resultados.roas }}</div>
+    <div class="card"><i class="fas fa-chart-line"></i><strong> CAC:</strong><br>R$ {{ resultados.cac }}</div>
+    <div class="card"><i class="fas fa-phone-volume"></i><strong> Custo por Call:</strong><br>R$ {{ resultados.custo_por_call }}</div>
+    <div class="card"><i class="fas fa-user-tie"></i><strong> SDRs necessários:</strong><br>{{ resultados.sdrs }}</div>
+    <div class="card"><i class="fas fa-briefcase"></i><strong> Closers necessários:</strong><br>{{ resultados.closers }}</div>
+    </div>
+        <canvas id="funnelChart" width="400" height="300"></canvas>
+
+        <div class="results" style="margin-top: 3rem;">
+            <div class="card"><i class="fas fa-percentage"></i><strong>Conversão total do funil:</strong><br>{{ resultados.taxa_total_funil }}%</div>
+            <div class="card"><i class="fas fa-search-dollar"></i><strong>Retorno por lead:</strong><br>R$ {{ resultados.retorno_por_lead }}</div>
+            <div class="card"><i class="fas fa-trophy"></i><strong>Lucro estimado:</strong><br>R$ {{ resultados.lucro }}</div>
+        </div>
+
+        <script>
+            // Sincronização Slider <-> Input de Investimento
+            const slider = document.getElementById('investimento_slider');
+            const numberInput = document.getElementById('investimento_input');
+
+            // Atualiza input numérico ao mover slider
+            slider.addEventListener('input', function() {
+                numberInput.value = this.value;
+            });
+
+            // Atualiza slider ao digitar no input numérico
+            numberInput.addEventListener('input', function() {
+                // Garante que o valor esteja dentro dos limites do slider visualmente, se desejar, ou apenas atualiza
+                slider.value = this.value;
+            });
+
+            const ctx = document.getElementById('funnelChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Leads', 'Agendamentos', 'Comparecimentos', 'Vendas'],
+                    datasets: [{
+                        label: 'Funil Comercial',
+                        data: [{{ resultados.leads }}, {{ resultados.agendamentos }}, {{ resultados.comparecimentos }}, {{ resultados.vendas }}],
+                        backgroundColor: ['#0B132B', '#1C2541', '#3A506B', '#5BC0BE'],
+                        borderRadius: 10
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: 'white' },
+                            grid: { color: '#333' }
+                        },
+                        x: {
+                            ticks: { color: 'white' },
+                            grid: { color: '#333' }
+                        }
+                    }
+                }
+            });
+
+            setTimeout(() => {
+                document.getElementById('results-box').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+        </script>
+    </div>
+    {% endif %}
+</div>
+
+<footer>
+    © {{ year }} Eluria —
+    <a href="https://eluria.com.br" target="_blank">Site</a>
+</footer>
+</body>
+</html>

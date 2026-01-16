@@ -1,0 +1,15 @@
+﻿services:
+  db:
+    image: postgres:16
+    container_name: boost_db
+    environment:
+      POSTGRES_USER: boostuser
+      POSTGRES_PASSWORD: boostpass
+      POSTGRES_DB: boostdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
