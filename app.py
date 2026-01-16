@@ -11,8 +11,16 @@ app = Flask(__name__)
 # ---------------------------------------------------------------------------
 app.secret_key = os.getenv("SECRET_KEY", "change-me-in-production")
 
-# Ex.: export DATABASE_URL="postgresql+psycopg2://user:pass@localhost:5432/boostdb"
-db_url = os.getenv("DATABASE_URL", "sqlite:///local.db")  # fallback dev local
+vercel_env = os.getenv("VERCEL_ENV") or os.getenv("VERCEL")
+
+db_url = os.getenv("DATABASE_URL")
+if not db_url:
+    if vercel_env:
+        db_path = os.path.join("/tmp", "local.db")
+        db_url = f"sqlite:///{db_path}"
+    else:
+        db_url = "sqlite:///local.db"
+
 app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
